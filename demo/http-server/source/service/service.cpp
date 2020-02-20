@@ -1,4 +1,4 @@
-#include "server.hpp"
+#include "service.hpp"
 
 
 APIService::APIService()
@@ -15,38 +15,44 @@ int APIService::Start()
 {
     auto enumTagsResource = make_shared< Resource >( );
     enumTagsResource->set_path( "/tags/enum" );
-    enumTagsResource->set_method_handler( "GET", this.enumTags );
-    this.httpService.publish(enumTagsResource);
+    auto enumTagsFunc = bind(&APIService::enumTags, this, placeholders::_1);
+    enumTagsResource->set_method_handler( "GET", enumTagsFunc );
+
+    httpService.publish(enumTagsResource);
 
     auto queryHisDataResource = make_shared< Resource >( );
     queryHisDataResource->set_path( "/history/query" );
-    queryHisDataResource->set_method_handler( "GET", this.queryHisData );
-    this.httpService.publish(queryHisDataResource);
+    auto queryHisDataFunc = bind(&APIService::queryHisData, this, placeholders::_1);
+    queryHisDataResource->set_method_handler( "GET", queryHisDataFunc );
+    httpService.publish(queryHisDataResource);
 
     auto subscribeRealDataResource = make_shared< Resource >( );
     subscribeRealDataResource->set_path( "/realtime/subscribe" );
-    subscribeRealDataResource->set_method_handler( "GET", this.subscribeRealData );
-    this.httpService.publish(subscribeRealDataResource);
+    auto subscribeRealDataFunc = bind(&APIService::subscribeRealData, this, placeholders::_1);
+    subscribeRealDataResource->set_method_handler( "GET", subscribeRealDataFunc );
+    httpService.publish(subscribeRealDataResource);
 
     auto unsubscribeRealDataResource = make_shared< Resource >( );
     unsubscribeRealDataResource->set_path( "/realtime/unsubscribe" );
-    unsubscribeRealDataResource->set_method_handler( "GET", this.unsubscribeRealData );
-    this.httpService.publish(unsubscribeRealDataResource);
+    auto unsubscribeRealDataFunc = bind(&APIService::unsubscribeRealData, this, placeholders::_1);
+    unsubscribeRealDataResource->set_method_handler( "GET", unsubscribeRealDataFunc );
+    httpService.publish(unsubscribeRealDataResource);
 
     auto isHealthResource = make_shared< Resource >( );
     isHealthResource->set_path( "/ishealth" );
-    isHealthResource->set_method_handler( "GET", this.isHealth );
-    this.httpService.publish(isHealthResource);
+    auto isHealthFunc = bind(&APIService::isHealth, this, placeholders::_1);
+    isHealthResource->set_method_handler( "GET", isHealthFunc );
+    httpService.publish(isHealthResource);
 }
 
 void APIService::Stop()
 {
-    this.httpService.stop()
+    httpService.stop();
 }
 
 void APIService::Run()
 {
-    this.httpService.start();
+    httpService.start();
 }
 
 void APIService::enumTags( const shared_ptr< Session > session )

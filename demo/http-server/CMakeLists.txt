@@ -13,5 +13,5 @@ include_directories( SYSTEM ${catch_INCLUDE} )
 #
 # Build
 #
-add_executable( httpServer ${SOURCE_DIR}/main.cpp )
+add_executable( httpServer ${SOURCE_DIR}/main.cpp ${SOURCE_DIR}/service/service.cpp )
 target_link_libraries( httpServer ${STATIC_LIBRARY_NAME} )
