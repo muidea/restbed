@@ -15,4 +15,3 @@ include_directories( SYSTEM ${catch_INCLUDE} )
 #
 add_executable( httpServer ${SOURCE_DIR}/main.cpp )
 target_link_libraries( httpServer ${STATIC_LIBRARY_NAME} )
-add_test( httpServer ${EXECUTABLE_OUTPUT_PATH}/httpServer )
