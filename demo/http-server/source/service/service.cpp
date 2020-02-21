@@ -1,5 +1,12 @@
+#include <json/json.h>
+#include <list>
+#include <string>
+#include<sstream>
 #include "service.hpp"
+#include "tag.hpp"
+#include "value.hpp"
 
+using namespace std;
 
 APIService::APIService()
 {
@@ -62,8 +69,24 @@ void APIService::enumTags( const shared_ptr< Session > session )
 
     session->fetch( content_length, [ request ]( const shared_ptr< Session > session, const Bytes & body )
     {
-        fprintf( stdout, "%.*s\n", ( int ) body.size( ), body.data( ) );
-        session->close( OK, "enumTags!", { { "Content-Length", "13" }, { "Connection", "close" } } );
+        fprintf( stdout, "%s\n", "enumTags" );
+
+        Json::Value root;
+        list< tagInfo > tags;
+        auto iter = tags.begin();
+        for (; iter != tags.end(); ++iter ){
+            Json::Value val;
+            iter->jsonVal(val);
+
+            root.append(val);
+        }
+
+        string content  = root.toStyledString();
+        stringstream stream;
+        stream << content.length();
+        string contentLen = stream.str();
+
+        session->close( OK, content, { { "Content-Length", contentLen }, { "Connection", "close" } } );
     });
 }
 
@@ -74,7 +97,7 @@ void APIService::queryHisData( const shared_ptr< Session > session )
 
     session->fetch( content_length, [ request ]( const shared_ptr< Session > session, const Bytes & body )
     {
-        fprintf( stdout, "%.*s\n", ( int ) body.size( ), body.data( ) );
+        fprintf( stdout, "%s\n", "queryHisData" );
         session->close( OK, "queryHisData!", { { "Content-Length", "13" }, { "Connection", "close" } } );
     });
 }
@@ -86,8 +109,8 @@ void APIService::subscribeRealData( const shared_ptr< Session > session )
 
     session->fetch( content_length, [ request ]( const shared_ptr< Session > session, const Bytes & body )
     {
-        fprintf( stdout, "%.*s\n", ( int ) body.size( ), body.data( ) );
-        session->close( OK, "subscribeRealData!", { { "Content-Length", "13" }, { "Connection", "close" } } );
+        fprintf( stdout, "%s\n", "subscribeRealData" );
+        session->close( OK, "subscribeRealData!", { { "Content-Length", "18" }, { "Connection", "close" } } );
     });
 }
 
@@ -98,8 +121,8 @@ void APIService::unsubscribeRealData( const shared_ptr< Session > session )
 
     session->fetch( content_length, [ request ]( const shared_ptr< Session > session, const Bytes & body )
     {
-        fprintf( stdout, "%.*s\n", ( int ) body.size( ), body.data( ) );
-        session->close( OK, "unsubscribeRealData!", { { "Content-Length", "13" }, { "Connection", "close" } } );
+        fprintf( stdout, "%s\n", "{\"account\":\"administrator\",\"password\":\"administrator\"}" );
+        session->close( OK, "{\"account\":\"administrator\",\"password\":\"administrator\"}", { { "Content-Length", "55" }, { "Connection", "close" },{ "Content-Type", "application/json;charset=UTF-8" } } );
     });
 }
 
@@ -110,7 +133,7 @@ void APIService::isHealth( const shared_ptr< Session > session )
 
     session->fetch( content_length, [ request ]( const shared_ptr< Session > session, const Bytes & body )
     {
-        fprintf( stdout, "%.*s\n", ( int ) body.size( ), body.data( ) );
+        fprintf( stdout, "%s\n", "isHealth" );
         session->close( OK, "isHealth!", { { "Content-Length", "13" }, { "Connection", "close" } } );
     });
 }
