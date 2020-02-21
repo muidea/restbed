@@ -49,7 +49,9 @@ if ( BUILD_SSL )
     find_package( openssl REQUIRED )
 endif ( )
 
-include_directories( ${INCLUDE_DIR} SYSTEM ${asio_INCLUDE} ${ssl_INCLUDE} )
+find_package( jsoncpp REQUIRED )
+
+include_directories( ${INCLUDE_DIR} SYSTEM ${asio_INCLUDE} ${ssl_INCLUDE} ${jsoncpp_INCLUDE} )
 
 #
 # Build
