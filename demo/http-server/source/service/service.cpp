@@ -1,12 +1,16 @@
 #include <json/json.h>
 #include <list>
 #include <string>
-#include<sstream>
+#include <sstream>
+#include <iostream>
 #include "service.hpp"
 #include "tag.hpp"
 #include "value.hpp"
 
 using namespace std;
+
+void mockTags( list< tagInfo >& tags );
+void mockValues(list<tagValue>& values);
 
 APIService::APIService()
 {
@@ -67,27 +71,27 @@ void APIService::enumTags( const shared_ptr< Session > session )
     const auto request = session->get_request( );
     size_t content_length = request->get_header( "Content-Length", 0 );
 
-    session->fetch( content_length, [ request ]( const shared_ptr< Session > session, const Bytes & body )
-    {
-        fprintf( stdout, "%s\n", "enumTags" );
+    fprintf( stdout, "%s\n", "enumTags" );
 
-        Json::Value root;
-        list< tagInfo > tags;
-        auto iter = tags.begin();
-        for (; iter != tags.end(); ++iter ){
-            Json::Value val;
-            iter->jsonVal(val);
+    Json::Value root;
+    list< tagInfo > tags;
+    mockTags(tags);
 
-            root.append(val);
-        }
+    auto iter = tags.begin();
+    for (; iter != tags.end(); ++iter ){
+        Json::Value val;
+        iter->jsonVal(val);
 
-        string content  = root.toStyledString();
-        stringstream stream;
-        stream << content.length();
-        string contentLen = stream.str();
+        root.append(val);
+    }
 
-        session->close( OK, content, { { "Content-Length", contentLen }, { "Connection", "close" } } );
-    });
+    string content  = root.toStyledString();
+    std::cout << content << std::endl;
+    stringstream stream;
+    stream << content.length();
+    string contentLen = stream.str();
+
+    session->close( OK, content, { { "Content-Length", contentLen }, { "Connection", "close" }, { "Content-Type", "application/json;charset=UTF-8" } } );
 }
 
 void APIService::queryHisData( const shared_ptr< Session > session )
