@@ -1,8 +1,10 @@
-#pragma once
+#ifndef __SERVICE_HPP_1656__
+#define __SERVICE_HPP_1656__
 
 #include <memory>
 #include <cstdlib>
 #include <restbed>
+
 #include <json/json.h>
 
 using namespace std;
@@ -32,3 +34,5 @@ private:
     Service httpService;
 
 };
+
+#endif

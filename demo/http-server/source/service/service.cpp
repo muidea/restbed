@@ -6,6 +6,7 @@
 #include "service.hpp"
 #include "tag.hpp"
 #include "value.hpp"
+#include "common.hpp"
 
 using namespace std;
 
@@ -73,20 +74,25 @@ void APIService::enumTags( const shared_ptr< Session > session )
 
     fprintf( stdout, "%s\n", "enumTags" );
 
-    Json::Value content;
+    Json::Value allContent, pageContent,tagsContent;
     list< tagInfo > tags;
     mockTags(tags);
+
+    pageInfo page(1, 1, 50);
+    page.jsonVal(pageContent);
+    allContent["pagination"] = pageContent;
 
     auto iter = tags.begin();
     for (; iter != tags.end(); ++iter ){
         Json::Value val;
         iter->jsonVal(val);
 
-        content.append(val);
+        tagsContent.append(val);
     }
+    allContent["tags"] = tagsContent;
 
     Json::Value result;
-    this->constructResult(0,"", content, result);
+    this->constructResult(0,"", allContent, result);
     string resultContent  = result.toStyledString();
     stringstream stream;
     stream << resultContent.length();
@@ -102,20 +108,25 @@ void APIService::queryHisData( const shared_ptr< Session > session )
     int catalog = request->get_query_parameter("catalog", 0);
 
     fprintf( stdout, "%s, catalog:%d\n", "queryHisData", catalog );
-    Json::Value content;
+    Json::Value allContent, pageContent,tagsContent;
     list< tagValue > values;
     mockValues(values);
+
+    pageInfo page(1, 1, 50);
+    page.jsonVal(pageContent);
+    allContent["pagination"] = pageContent;
 
     auto iter = values.begin();
     for (; iter != values.end(); ++iter ){
         Json::Value val;
         iter->jsonVal(val);
 
-        content.append(val);
+        tagsContent.append(val);
     }
+    allContent["values"] = tagsContent;
 
     Json::Value result;
-    this->constructResult(0,"", content, result);
+    this->constructResult(0,"", allContent, result);
     string resultContent  = result.toStyledString();
     stringstream stream;
     stream << resultContent.length();
