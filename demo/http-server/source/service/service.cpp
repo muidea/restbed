@@ -143,6 +143,17 @@ void APIService::isHealth( const shared_ptr< Session > session )
     const auto request = session->get_request( );
     size_t content_length = request->get_header( "Content-Length", 0 );
 
+    fprintf( stdout, "%s\n", "isHealth" );
+    Json::Value content;
+    content["status"] = 0;
+    Json::Value result;
+    this->constructResult(0,"", content, result);
+    string resultContent  = result.toStyledString();
+    stringstream stream;
+    stream << resultContent.length();
+    string resultLen = stream.str();
+
+    session->close( OK, resultContent, { { "Content-Length", resultLen }, { "Connection", "close" }, { "Content-Type", "application/json;charset=UTF-8" } } );
 }
 
 void APIService::constructResult(int errorCode, string const& reason, Json::Value& content, Json::Value& result)
