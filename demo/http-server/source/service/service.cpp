@@ -99,8 +99,9 @@ void APIService::queryHisData( const shared_ptr< Session > session )
 {
     const auto request = session->get_request( );
     size_t content_length = request->get_header( "Content-Length", 0 );
+    int catalog = request->get_query_parameter("catalog", 0);
 
-    fprintf( stdout, "%s\n", "queryHisData" );
+    fprintf( stdout, "%s, catalog:%d\n", "queryHisData", catalog );
     Json::Value content;
     list< tagValue > values;
     mockValues(values);
