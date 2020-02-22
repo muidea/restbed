@@ -137,9 +137,8 @@ void APIService::subscribeRealDataHandler(const shared_ptr< Session > session, c
 {
     char* dataPtr = (char*)payload.data();
     Json::Reader reader;
-    Json::Value content;
-    Json::Value result;
-    if (reader.parse(dataPtr, content)) {
+    Json::Value param,result,content;
+    if (reader.parse(dataPtr, param)) {
         this->constructResult(0,"", content, result);
     } else {
         this->constructResult(1,"invalid param", content, result);
@@ -166,9 +165,8 @@ void APIService::unsubscribeRealDataHandler(const shared_ptr< Session > session,
 {
     char* dataPtr = (char*)payload.data();
     Json::Reader reader;
-    Json::Value content;
-    Json::Value result;
-    if (reader.parse(dataPtr, content)) {
+    Json::Value param,result,content;
+    if (reader.parse(dataPtr, param)) {
         this->constructResult(0,"", content, result);
     } else {
         this->constructResult(1,"invalid param", content, result);
