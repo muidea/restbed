@@ -73,7 +73,7 @@ void APIService::enumTags( const shared_ptr< Session > session )
 
     fprintf( stdout, "%s\n", "enumTags" );
 
-    Json::Value root;
+    Json::Value content;
     list< tagInfo > tags;
     mockTags(tags);
 
@@ -82,16 +82,17 @@ void APIService::enumTags( const shared_ptr< Session > session )
         Json::Value val;
         iter->jsonVal(val);
 
-        root.append(val);
+        content.append(val);
     }
 
-    string content  = root.toStyledString();
-    std::cout << content << std::endl;
+    Json::Value result;
+    this->constructResult(0,"", content, result);
+    string resultContent  = result.toStyledString();
     stringstream stream;
-    stream << content.length();
-    string contentLen = stream.str();
+    stream << resultContent.length();
+    string resultLen = stream.str();
 
-    session->close( OK, content, { { "Content-Length", contentLen }, { "Connection", "close" }, { "Content-Type", "application/json;charset=UTF-8" } } );
+    session->close( OK, resultContent, { { "Content-Length", resultLen }, { "Connection", "close" }, { "Content-Type", "application/json;charset=UTF-8" } } );
 }
 
 void APIService::queryHisData( const shared_ptr< Session > session )
@@ -99,23 +100,35 @@ void APIService::queryHisData( const shared_ptr< Session > session )
     const auto request = session->get_request( );
     size_t content_length = request->get_header( "Content-Length", 0 );
 
-    session->fetch( content_length, [ request ]( const shared_ptr< Session > session, const Bytes & body )
-    {
-        fprintf( stdout, "%s\n", "queryHisData" );
-        session->close( OK, "queryHisData!", { { "Content-Length", "13" }, { "Connection", "close" } } );
-    });
+    fprintf( stdout, "%s\n", "queryHisData" );
+    Json::Value content;
+    list< tagValue > values;
+    mockValues(values);
+
+    auto iter = values.begin();
+    for (; iter != values.end(); ++iter ){
+        Json::Value val;
+        iter->jsonVal(val);
+
+        content.append(val);
+    }
+
+    Json::Value result;
+    this->constructResult(0,"", content, result);
+    string resultContent  = result.toStyledString();
+    stringstream stream;
+    stream << resultContent.length();
+    string resultLen = stream.str();
+
+    session->close( OK, resultContent, { { "Content-Length", resultLen }, { "Connection", "close" }, { "Content-Type", "application/json;charset=UTF-8" } } );
 }
 
 void APIService::subscribeRealData( const shared_ptr< Session > session )
 {
     const auto request = session->get_request( );
     size_t content_length = request->get_header( "Content-Length", 0 );
+    fprintf( stdout, "%s\n", "subscribeRealData" );
 
-    session->fetch( content_length, [ request ]( const shared_ptr< Session > session, const Bytes & body )
-    {
-        fprintf( stdout, "%s\n", "subscribeRealData" );
-        session->close( OK, "subscribeRealData!", { { "Content-Length", "18" }, { "Connection", "close" } } );
-    });
 }
 
 void APIService::unsubscribeRealData( const shared_ptr< Session > session )
@@ -123,11 +136,6 @@ void APIService::unsubscribeRealData( const shared_ptr< Session > session )
     const auto request = session->get_request( );
     size_t content_length = request->get_header( "Content-Length", 0 );
 
-    session->fetch( content_length, [ request ]( const shared_ptr< Session > session, const Bytes & body )
-    {
-        fprintf( stdout, "%s\n", "{\"account\":\"administrator\",\"password\":\"administrator\"}" );
-        session->close( OK, "{\"account\":\"administrator\",\"password\":\"administrator\"}", { { "Content-Length", "55" }, { "Connection", "close" },{ "Content-Type", "application/json;charset=UTF-8" } } );
-    });
 }
 
 void APIService::isHealth( const shared_ptr< Session > session )
@@ -135,9 +143,11 @@ void APIService::isHealth( const shared_ptr< Session > session )
     const auto request = session->get_request( );
     size_t content_length = request->get_header( "Content-Length", 0 );
 
-    session->fetch( content_length, [ request ]( const shared_ptr< Session > session, const Bytes & body )
-    {
-        fprintf( stdout, "%s\n", "isHealth" );
-        session->close( OK, "isHealth!", { { "Content-Length", "13" }, { "Connection", "close" } } );
-    });
+}
+
+void APIService::constructResult(int errorCode, string const& reason, Json::Value& content, Json::Value& result)
+{
+    result["errorCode"] = errorCode;
+    result["reason"] = reason;
+    result["data"] = content;
 }
