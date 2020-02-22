@@ -23,6 +23,9 @@ protected:
     void unsubscribeRealData( const shared_ptr< Session > session );
     void isHealth( const shared_ptr< Session > session );
 
+    void subscribeRealDataHandler(const shared_ptr< Session > session, Bytes const& payload);
+    void unsubscribeRealDataHandler(const shared_ptr< Session > session, Bytes const& payload);
+
     void constructResult(int errorCode, string const& reason, Json::Value& content, Json::Value& result);
 
 private:

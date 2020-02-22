@@ -40,13 +40,13 @@ int APIService::Start()
     auto subscribeRealDataResource = make_shared< Resource >( );
     subscribeRealDataResource->set_path( "/realtime/subscribe" );
     auto subscribeRealDataFunc = bind(&APIService::subscribeRealData, this, placeholders::_1);
-    subscribeRealDataResource->set_method_handler( "GET", subscribeRealDataFunc );
+    subscribeRealDataResource->set_method_handler( "POST", subscribeRealDataFunc );
     httpService.publish(subscribeRealDataResource);
 
     auto unsubscribeRealDataResource = make_shared< Resource >( );
     unsubscribeRealDataResource->set_path( "/realtime/unsubscribe" );
     auto unsubscribeRealDataFunc = bind(&APIService::unsubscribeRealData, this, placeholders::_1);
-    unsubscribeRealDataResource->set_method_handler( "GET", unsubscribeRealDataFunc );
+    unsubscribeRealDataResource->set_method_handler( "POST", unsubscribeRealDataFunc );
     httpService.publish(unsubscribeRealDataResource);
 
     auto isHealthResource = make_shared< Resource >( );
@@ -127,8 +127,29 @@ void APIService::subscribeRealData( const shared_ptr< Session > session )
 {
     const auto request = session->get_request( );
     size_t content_length = request->get_header( "Content-Length", 0 );
-    fprintf( stdout, "%s\n", "subscribeRealData" );
 
+    auto handler = bind(&APIService::subscribeRealDataHandler, this, placeholders::_1, placeholders::_2);
+    session->fetch( content_length, handler);
+}
+
+void APIService::subscribeRealDataHandler(const shared_ptr< Session > session, const Bytes& payload)
+{
+    char* dataPtr = (char*)payload.data();
+    Json::Reader reader;
+    Json::Value content;
+    Json::Value result;
+    if (reader.parse(dataPtr, content)) {
+        this->constructResult(0,"", content, result);
+    } else {
+        this->constructResult(1,"invalid param", content, result);
+    }
+
+    string resultContent  = result.toStyledString();
+    stringstream stream;
+    stream << resultContent.length();
+    string resultLen = stream.str();
+
+    session->close( OK, resultContent, { { "Content-Length", resultLen }, { "Connection", "close" }, { "Content-Type", "application/json;charset=UTF-8" } } );
 }
 
 void APIService::unsubscribeRealData( const shared_ptr< Session > session )
@@ -136,6 +157,28 @@ void APIService::unsubscribeRealData( const shared_ptr< Session > session )
     const auto request = session->get_request( );
     size_t content_length = request->get_header( "Content-Length", 0 );
 
+    auto handler = bind(&APIService::unsubscribeRealDataHandler, this, placeholders::_1, placeholders::_2);
+    session->fetch( content_length, handler);
+}
+
+void APIService::unsubscribeRealDataHandler(const shared_ptr< Session > session, const Bytes& payload)
+{
+    char* dataPtr = (char*)payload.data();
+    Json::Reader reader;
+    Json::Value content;
+    Json::Value result;
+    if (reader.parse(dataPtr, content)) {
+        this->constructResult(0,"", content, result);
+    } else {
+        this->constructResult(1,"invalid param", content, result);
+    }
+
+    string resultContent  = result.toStyledString();
+    stringstream stream;
+    stream << resultContent.length();
+    string resultLen = stream.str();
+
+    session->close( OK, resultContent, { { "Content-Length", resultLen }, { "Connection", "close" }, { "Content-Type", "application/json;charset=UTF-8" } } );
 }
 
 void APIService::isHealth( const shared_ptr< Session > session )
