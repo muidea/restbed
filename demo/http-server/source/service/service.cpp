@@ -12,6 +12,7 @@ using namespace std;
 
 void mockTags( list< tagInfo >& tags );
 void mockValues(list<tagValue>& values);
+void mockTagsValues(tagValuesMap& values);
 
 APIService::APIService()
 {
@@ -109,8 +110,8 @@ void APIService::queryHisData( const shared_ptr< Session > session )
 
     fprintf( stdout, "%s, catalog:%d\n", "queryHisData", catalog );
     Json::Value allContent, pageContent,tagsContent;
-    list< tagValue > values;
-    mockValues(values);
+    tagValuesMap values;
+    mockTagsValues(values);
 
     pageInfo page(1, 1, 50);
     page.jsonVal(pageContent);
@@ -118,11 +119,18 @@ void APIService::queryHisData( const shared_ptr< Session > session )
 
     auto iter = values.begin();
     for (; iter != values.end(); ++iter ){
-        Json::Value val;
-        iter->jsonVal(val);
+        Json::Value valList;
+        auto vals = iter->second;
+        for ( auto i = vals.begin(); i != vals.end(); ++i) {
+            Json::Value val;
+            i->jsonVal(val);
 
-        tagsContent.append(val);
+            valList.append(val);
+        }
+
+        tagsContent[iter->first] = valList;
     }
+
     allContent["values"] = tagsContent;
 
     Json::Value result;

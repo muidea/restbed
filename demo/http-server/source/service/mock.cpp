@@ -33,3 +33,26 @@ void mockValues(list<tagValue>& values)
     tagValue v4("tag004", "test string", 0, "2020年02月21日 11:51:33");
     values.push_back(v4);
 }
+
+void mockTagsValues(tagValuesMap& values)
+{
+    tagValueList tag1List;
+    tagValue v1("tag001", 12, 0, "2020年02月21日 11:51:33");
+    tag1List.push_back(v1);
+    values["tag001"] = tag1List;
+
+    tagValueList tag2List;
+    tagValue v2("tag002", 23.456, 0, "2020年02月21日 11:51:33");
+    tag2List.push_back(v2);
+    values["tag002"] = tag2List;
+
+    tagValueList tag3List;
+    tagValue v3("tag003", true, 0, "2020年02月21日 11:51:33");
+    tag3List.push_back(v3);
+    values["tag003"] = tag3List;
+
+    tagValueList tag4List;
+    tagValue v4("tag004", "test string", 0, "2020年02月21日 11:51:33");
+    tag4List.push_back(v4);
+    values["tag004"] = tag4List;
+}
