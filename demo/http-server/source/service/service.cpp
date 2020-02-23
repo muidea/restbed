@@ -144,6 +144,8 @@ void APIService::subscribeRealDataHandler(const shared_ptr< Session > session, c
 
         subscribeParam param;
         if (0 !=param.parse(jsonParam)) {
+            errorCode = 1;
+            reason = "invalid jsonParam";
             break;
         }
 
@@ -189,6 +191,8 @@ void APIService::unsubscribeRealDataHandler(const shared_ptr< Session > session,
 
         unsubscribeParam param;
         if (0 !=param.parse(jsonParam)) {
+            errorCode = 1;
+            reason = "invalid jsonParam";
             break;
         }
 
