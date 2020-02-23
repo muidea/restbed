@@ -6,14 +6,17 @@
 #include <restbed>
 
 #include <json/json.h>
+#include <jthread/jthread.h>
 
 using namespace std;
 using namespace restbed;
+using namespace jthread;
 
-class APIService {
+class APIService
+    : protected JThread {
 public:
     APIService();
-    ~APIService();
+    virtual ~APIService();
     int Start();
     void Stop();
     void Run();
@@ -28,9 +31,11 @@ protected:
     void subscribeRealDataHandler(const shared_ptr< Session > session, Bytes const& payload);
     void unsubscribeRealDataHandler(const shared_ptr< Session > session, Bytes const& payload);
 
-private:
-    Service httpService;
+    virtual void *Thread();
 
+private:
+    bool _runningFlag;
+    Service _httpService;
 };
 
 #endif

@@ -51,7 +51,9 @@ endif ( )
 
 find_package( jsoncpp REQUIRED )
 
-include_directories( ${INCLUDE_DIR} SYSTEM ${asio_INCLUDE} ${ssl_INCLUDE} ${jsoncpp_INCLUDE} )
+find_package( jthread REQUIRED )
+
+include_directories( ${INCLUDE_DIR} SYSTEM ${asio_INCLUDE} ${ssl_INCLUDE} ${jsoncpp_INCLUDE} ${jthread_INCLUDE} )
 
 #
 # Build

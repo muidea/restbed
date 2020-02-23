@@ -26,46 +26,50 @@ APIService::~APIService()
 
 int APIService::Start()
 {
+    _runningFlag = true;
+
     auto enumTagsResource = make_shared< Resource >( );
     enumTagsResource->set_path( "/tags/enum" );
     auto enumTagsFunc = bind(&APIService::enumTags, this, placeholders::_1);
     enumTagsResource->set_method_handler( "GET", enumTagsFunc );
 
-    httpService.publish(enumTagsResource);
+    _httpService.publish(enumTagsResource);
 
     auto queryHisDataResource = make_shared< Resource >( );
     queryHisDataResource->set_path( "/history/query" );
     auto queryHisDataFunc = bind(&APIService::queryHisData, this, placeholders::_1);
     queryHisDataResource->set_method_handler( "GET", queryHisDataFunc );
-    httpService.publish(queryHisDataResource);
+    _httpService.publish(queryHisDataResource);
 
     auto subscribeRealDataResource = make_shared< Resource >( );
     subscribeRealDataResource->set_path( "/realtime/subscribe" );
     auto subscribeRealDataFunc = bind(&APIService::subscribeRealData, this, placeholders::_1);
     subscribeRealDataResource->set_method_handler( "POST", subscribeRealDataFunc );
-    httpService.publish(subscribeRealDataResource);
+    _httpService.publish(subscribeRealDataResource);
 
     auto unsubscribeRealDataResource = make_shared< Resource >( );
     unsubscribeRealDataResource->set_path( "/realtime/unsubscribe" );
     auto unsubscribeRealDataFunc = bind(&APIService::unsubscribeRealData, this, placeholders::_1);
     unsubscribeRealDataResource->set_method_handler( "POST", unsubscribeRealDataFunc );
-    httpService.publish(unsubscribeRealDataResource);
+    _httpService.publish(unsubscribeRealDataResource);
 
     auto isHealthResource = make_shared< Resource >( );
     isHealthResource->set_path( "/ishealth" );
     auto isHealthFunc = bind(&APIService::isHealth, this, placeholders::_1);
     isHealthResource->set_method_handler( "GET", isHealthFunc );
-    httpService.publish(isHealthResource);
+    _httpService.publish(isHealthResource);
 }
 
 void APIService::Stop()
 {
-    httpService.stop();
+    _runningFlag = false;
+
+    _httpService.stop();
 }
 
 void APIService::Run()
 {
-    httpService.start();
+    _httpService.start();
 }
 
 void APIService::enumTags( const shared_ptr< Session > session )
@@ -226,4 +230,13 @@ void APIService::isHealth( const shared_ptr< Session > session )
     string resultLen = stream.str();
 
     session->close( OK, resultContent, { { "Content-Length", resultLen }, { "Connection", "close" }, { "Content-Type", "application/json;charset=UTF-8" } } );
+}
+
+void* APIService::Thread()
+{
+    while (_runningFlag)
+    {
+        //sleep(10000);
+    }
+    
 }
