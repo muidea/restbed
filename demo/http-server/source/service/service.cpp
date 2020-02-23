@@ -130,14 +130,25 @@ void APIService::subscribeRealDataHandler(const shared_ptr< Session > session, c
 {
     char* dataPtr = (char*)payload.data();
     Json::Reader reader;
-    Json::Value param;
+    Json::Value jsonParam;
 
     int errorCode = 0;
     string reason = "";
-    if (!reader.parse(dataPtr, param)) {
-        errorCode = 1;
-        reason = "invalid param";
-    }
+
+    do
+    {
+        if (!reader.parse(dataPtr, jsonParam)) {
+            errorCode = 1;
+            reason = "invalid jsonParam";
+        }
+
+        subscribeParam param;
+        if (0 !=param.parse(jsonParam)) {
+            break;
+        }
+
+    } while (false);
+        
 
     Json::Value jsonResult;
     subscribeResult result(errorCode, reason);
@@ -165,14 +176,23 @@ void APIService::unsubscribeRealDataHandler(const shared_ptr< Session > session,
 {
     char* dataPtr = (char*)payload.data();
     Json::Reader reader;
-    Json::Value param;
+    Json::Value jsonParam;
 
     int errorCode = 0;
     string reason = "";
-    if (!reader.parse(dataPtr, param)) {
-        errorCode = 1;
-        reason = "invalid param";
-    }
+    do
+    {
+        if (!reader.parse(dataPtr, jsonParam)) {
+            errorCode = 1;
+            reason = "invalid jsonParam";
+        }
+
+        unsubscribeParam param;
+        if (0 !=param.parse(jsonParam)) {
+            break;
+        }
+
+    } while (false);
 
     Json::Value jsonResult;
     subscribeResult result(errorCode, reason);
@@ -202,11 +222,4 @@ void APIService::isHealth( const shared_ptr< Session > session )
     string resultLen = stream.str();
 
     session->close( OK, resultContent, { { "Content-Length", resultLen }, { "Connection", "close" }, { "Content-Type", "application/json;charset=UTF-8" } } );
-}
-
-void APIService::constructResult(int errorCode, string const& reason, Json::Value& content, Json::Value& result)
-{
-    result["errorCode"] = errorCode;
-    result["reason"] = reason;
-    result["data"] = content;
 }

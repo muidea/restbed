@@ -28,8 +28,6 @@ protected:
     void subscribeRealDataHandler(const shared_ptr< Session > session, Bytes const& payload);
     void unsubscribeRealDataHandler(const shared_ptr< Session > session, Bytes const& payload);
 
-    void constructResult(int errorCode, string const& reason, Json::Value& content, Json::Value& result);
-
 private:
     Service httpService;
 
