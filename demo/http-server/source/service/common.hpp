@@ -85,6 +85,24 @@ private:
 typedef subscribeParam unsubscribeParam;
 typedef subscribeResult unsubscribeResult;
 
+class publishData
+{
+public:
+    publishData(string const& timeStamp, tagValueList const& vals);
+    publishData(publishData const& right);
+    ~publishData();
+
+    void jsonVal(Json::Value& val);
+    publishData& operator=(publishData const& right);
+
+protected:
+    string _timeStamp;
+    tagValueList _tagValueList;
+
+private:
+    publishData();
+};
+
 class queryParam
 {
 public:

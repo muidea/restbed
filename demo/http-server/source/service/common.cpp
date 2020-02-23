@@ -39,7 +39,6 @@ pageInfo& pageInfo::operator=(pageInfo const& right)
     return *this;
 }
 
-
 enumResult::enumResult(int errorCode, string const& reason, pageInfo const& pageInfo, tagInfoList const& tagInfos)
     : _errorCode(errorCode)
     , _reason(reason)
@@ -180,6 +179,49 @@ subscribeResult& subscribeResult::operator=(subscribeResult const& right)
 
     this->_errorCode = right._errorCode;
     this->_reason = right._reason;
+
+    return *this;
+}
+
+publishData::publishData(string const& timeStamp, tagValueList const& vals)
+    : _timeStamp(timeStamp)
+    , _tagValueList(vals)
+{
+}
+
+publishData::publishData(publishData const& right)
+    : _timeStamp(right._timeStamp)
+    , _tagValueList(right._tagValueList)
+{
+}
+
+publishData::~publishData()
+{
+}
+
+void publishData::jsonVal(Json::Value& allContent)
+{
+    Json::Value valueContent;
+    allContent["timestamp"] = this->_timeStamp;
+
+    auto iter = this->_tagValueList.begin();
+    for (; iter != this->_tagValueList.end(); ++iter ) {
+        Json::Value val;
+        iter->jsonVal(val);
+
+        valueContent.append(val);
+    }
+    allContent["value"] = valueContent;
+}
+
+publishData& publishData::operator=(publishData const& right)
+{
+    if (this == &right){
+        return *this;
+    }
+
+    this->_timeStamp = right._timeStamp;
+    this->_tagValueList = right._tagValueList;
 
     return *this;
 }
