@@ -75,26 +75,16 @@ void APIService::enumTags( const shared_ptr< Session > session )
 
     fprintf( stdout, "%s\n", "enumTags" );
 
-    Json::Value allContent, pageContent,tagsContent;
     list< tagInfo > tags;
     mockTags(tags);
 
     pageInfo page(1, 1, 50);
-    page.jsonVal(pageContent);
-    allContent["pagination"] = pageContent;
 
-    auto iter = tags.begin();
-    for (; iter != tags.end(); ++iter ){
-        Json::Value val;
-        iter->jsonVal(val);
+    Json::Value jsonResult;
+    enumResult result(0,"", page, tags);
+    result.jsonVal(jsonResult);
 
-        tagsContent.append(val);
-    }
-    allContent["tags"] = tagsContent;
-
-    Json::Value result;
-    this->constructResult(0,"", allContent, result);
-    string resultContent  = result.toStyledString();
+    string resultContent  = jsonResult.toStyledString();
     stringstream stream;
     stream << resultContent.length();
     string resultLen = stream.str();
@@ -109,33 +99,17 @@ void APIService::queryHisData( const shared_ptr< Session > session )
     int catalog = request->get_query_parameter("catalog", 0);
 
     fprintf( stdout, "%s, catalog:%d\n", "queryHisData", catalog );
-    Json::Value allContent, pageContent,tagsContent;
+
     tagValuesMap values;
     mockTagsValues(values);
 
     pageInfo page(1, 1, 50);
-    page.jsonVal(pageContent);
-    allContent["pagination"] = pageContent;
 
-    auto iter = values.begin();
-    for (; iter != values.end(); ++iter ){
-        Json::Value valList;
-        auto vals = iter->second;
-        for ( auto i = vals.begin(); i != vals.end(); ++i) {
-            Json::Value val;
-            i->jsonVal(val);
+    Json::Value jsonResult;
+    queryResult result(0,"", page, values);
+    result.jsonVal(jsonResult);
 
-            valList.append(val);
-        }
-
-        tagsContent[iter->first] = valList;
-    }
-
-    allContent["values"] = tagsContent;
-
-    Json::Value result;
-    this->constructResult(0,"", allContent, result);
-    string resultContent  = result.toStyledString();
+    string resultContent  = jsonResult.toStyledString();
     stringstream stream;
     stream << resultContent.length();
     string resultLen = stream.str();
@@ -156,14 +130,21 @@ void APIService::subscribeRealDataHandler(const shared_ptr< Session > session, c
 {
     char* dataPtr = (char*)payload.data();
     Json::Reader reader;
-    Json::Value param,result,content;
-    if (reader.parse(dataPtr, param)) {
-        this->constructResult(0,"", content, result);
-    } else {
-        this->constructResult(1,"invalid param", content, result);
+    Json::Value param;
+
+    int errorCode = 0;
+    string reason = "";
+    if (!reader.parse(dataPtr, param)) {
+        errorCode = 1;
+        reason = "invalid param";
     }
 
-    string resultContent  = result.toStyledString();
+    Json::Value jsonResult;
+    subscribeResult result(errorCode, reason);
+    result.jsonVal(jsonResult);
+
+    string resultContent  = jsonResult.toStyledString();
+
     stringstream stream;
     stream << resultContent.length();
     string resultLen = stream.str();
@@ -184,14 +165,20 @@ void APIService::unsubscribeRealDataHandler(const shared_ptr< Session > session,
 {
     char* dataPtr = (char*)payload.data();
     Json::Reader reader;
-    Json::Value param,result,content;
-    if (reader.parse(dataPtr, param)) {
-        this->constructResult(0,"", content, result);
-    } else {
-        this->constructResult(1,"invalid param", content, result);
+    Json::Value param;
+
+    int errorCode = 0;
+    string reason = "";
+    if (!reader.parse(dataPtr, param)) {
+        errorCode = 1;
+        reason = "invalid param";
     }
 
-    string resultContent  = result.toStyledString();
+    Json::Value jsonResult;
+    subscribeResult result(errorCode, reason);
+    result.jsonVal(jsonResult);
+
+    string resultContent  = jsonResult.toStyledString();
     stringstream stream;
     stream << resultContent.length();
     string resultLen = stream.str();
@@ -205,11 +192,11 @@ void APIService::isHealth( const shared_ptr< Session > session )
     size_t content_length = request->get_header( "Content-Length", 0 );
 
     fprintf( stdout, "%s\n", "isHealth" );
-    Json::Value content;
-    content["status"] = 0;
-    Json::Value result;
-    this->constructResult(0,"", content, result);
-    string resultContent  = result.toStyledString();
+    Json::Value jsonResult;
+    healthResult result(0, "", 0);
+    result.jsonVal(jsonResult);
+
+    string resultContent  = jsonResult.toStyledString();
     stringstream stream;
     stream << resultContent.length();
     string resultLen = stream.str();

@@ -1,6 +1,7 @@
 #ifndef __TAG_HPP_1025__
 #define __TAG_HPP_1025__
 #include <cstdlib>
+#include <list>
 #include "json/json.h"
 
 using namespace std;
@@ -26,5 +27,7 @@ private:
     tagInfo();
 
 };
+
+typedef list<tagInfo> tagInfoList;
 
 #endif
