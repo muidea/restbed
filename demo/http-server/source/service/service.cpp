@@ -266,6 +266,8 @@ void APIService::isHealth( const shared_ptr< Session > session )
 
 void* APIService::Thread()
 {
+    JThread::ThreadStarted();
+    
     while (_runningFlag)
     {
         sleep(1);
