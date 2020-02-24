@@ -17,11 +17,10 @@ public:
     tagInfo& operator=(tagInfo const& right);
 
 protected:
-    string name;
-    string desc;
-    string unit;
-    int type;
-    Json::Value tag;
+    string _name;
+    string _desc;
+    string _unit;
+    int _type;
 
 private:
     tagInfo();

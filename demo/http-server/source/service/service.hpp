@@ -8,6 +8,8 @@
 #include <json/json.h>
 #include <jthread/jthread.h>
 
+#include "provider.hpp"
+
 using namespace std;
 using namespace restbed;
 using namespace jthread;
@@ -28,6 +30,7 @@ protected:
     void unsubscribeRealData( const shared_ptr< Session > session );
     void isHealth( const shared_ptr< Session > session );
 
+    void queryHisDataHandler(const shared_ptr< Session > session, Bytes const& payload);
     void subscribeRealDataHandler(const shared_ptr< Session > session, Bytes const& payload);
     void unsubscribeRealDataHandler(const shared_ptr< Session > session, Bytes const& payload);
 
@@ -36,6 +39,8 @@ protected:
 private:
     bool _runningFlag;
     Service _httpService;
+
+    Provider _provider;
 };
 
 #endif

@@ -3,16 +3,14 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <stdlib.h>
+#include <unistd.h>
 #include "service.hpp"
 #include "tag.hpp"
 #include "value.hpp"
 #include "common.hpp"
 
 using namespace std;
-
-void mockTags( list< tagInfo >& tags );
-void mockValues(list<tagValue>& values);
-void mockTagsValues(tagValuesMap& values);
 
 APIService::APIService()
 {
@@ -58,13 +56,21 @@ int APIService::Start()
     auto isHealthFunc = bind(&APIService::isHealth, this, placeholders::_1);
     isHealthResource->set_method_handler( "GET", isHealthFunc );
     _httpService.publish(isHealthResource);
+
+    _provider.start();
+
+    return JThread::Start();
 }
 
 void APIService::Stop()
 {
     _runningFlag = false;
 
+    _provider.stop();
+
     _httpService.stop();
+
+    JThread::Kill();
 }
 
 void APIService::Run()
@@ -80,7 +86,7 @@ void APIService::enumTags( const shared_ptr< Session > session )
     fprintf( stdout, "%s\n", "enumTags" );
 
     list< tagInfo > tags;
-    mockTags(tags);
+    _provider.queryTags(tags);
 
     pageInfo page(1, 1, 50);
 
@@ -100,20 +106,46 @@ void APIService::queryHisData( const shared_ptr< Session > session )
 {
     const auto request = session->get_request( );
     size_t content_length = request->get_header( "Content-Length", 0 );
-    int catalog = request->get_query_parameter("catalog", 0);
 
-    fprintf( stdout, "%s, catalog:%d\n", "queryHisData", catalog );
+    auto handler = bind(&APIService::queryHisDataHandler, this, placeholders::_1, placeholders::_2);
+    session->fetch( content_length, handler);
+}
 
-    tagValuesMap values;
-    mockTagsValues(values);
+void APIService::queryHisDataHandler(const shared_ptr< Session > session, Bytes const& payload)
+{
+    char* dataPtr = (char*)payload.data();
+    Json::Reader reader;
+    Json::Value jsonParam;
 
-    pageInfo page(1, 1, 50);
+    int errorCode = 0;
+    string reason = "";
 
     Json::Value jsonResult;
-    queryResult result(0,"", page, values);
-    result.jsonVal(jsonResult);
+    do
+    {
+        if (!reader.parse(dataPtr, jsonParam)) {
+            errorCode = 1;
+            reason = "invalid jsonParam";
+        }
+
+        queryParam param;
+        if (0 !=param.parse(jsonParam)) {
+            errorCode = 1;
+            reason = "invalid jsonParam";
+            break;
+        }
+
+        pageInfo page(1, 1, 50);
+
+        tagValuesMap values;
+        _provider.queryValues(param.beginTime(), param.endTime(), param.valueCount(), values);
+
+        queryResult result(errorCode, reason, page, values);
+        result.jsonVal(jsonResult);
+    } while (false);
 
     string resultContent  = jsonResult.toStyledString();
+
     stringstream stream;
     stream << resultContent.length();
     string resultLen = stream.str();
@@ -236,7 +268,8 @@ void* APIService::Thread()
 {
     while (_runningFlag)
     {
-        //sleep(10000);
+        sleep(1);
+
+        fprintf( stdout, "%s\n", "APIService::Thread" );
     }
-    
 }

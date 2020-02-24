@@ -1,18 +1,18 @@
 #include "tag.hpp"
 
 tagInfo::tagInfo(string const &name, string const& desc, string const& unit, int type)
-    : name(name)
-    , desc(desc)
-    , unit(unit)
-    , type(type)
+    : _name(name)
+    , _desc(desc)
+    , _unit(unit)
+    , _type(type)
 {
 }
 
 tagInfo::tagInfo(tagInfo const& right)
-    : name(right.name)
-    , desc(right.desc)
-    , unit(right.unit)
-    , type(right.type)
+    : _name(right._name)
+    , _desc(right._desc)
+    , _unit(right._unit)
+    , _type(right._type)
 {
 }
 
@@ -22,10 +22,10 @@ tagInfo::~tagInfo()
 
 void tagInfo::jsonVal(Json::Value& val)
 {
-    val["name"] = name;
-    val["desc"] = desc;
-    val["unit"] = unit;
-    val["type"] = type;
+    val["name"] = _name;
+    val["desc"] = _desc;
+    val["unit"] = _unit;
+    val["type"] = _type;
 }
 
 tagInfo& tagInfo::operator=(tagInfo const& right)
@@ -34,10 +34,10 @@ tagInfo& tagInfo::operator=(tagInfo const& right)
         return *this;
     }
 
-    this->name = right.name;
-    this->desc = right.desc;
-    this->unit = right.unit;
-    this->type = right.type;
+    this->_name = right._name;
+    this->_desc = right._desc;
+    this->_unit = right._unit;
+    this->_type = right._type;
 
     return *this;
 }

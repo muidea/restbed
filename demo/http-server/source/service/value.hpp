@@ -15,14 +15,16 @@ public:
     tagValue(tagValue const& right);
     ~tagValue();
 
+    string const& name();
+
     void jsonVal(Json::Value& val);
     tagValue& operator=(tagValue const& right);
 
 protected:
-    string name;
-    Json::Value value;
-    int quality;
-    string timeStamp;
+    string _name;
+    Json::Value _value;
+    int _quality;
+    string _timeStamp;
 
 private:
     tagValue();
