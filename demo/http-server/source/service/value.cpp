@@ -20,7 +20,7 @@ tagValue::~tagValue()
 {
 }
 
-string const& tagValue::name() 
+string const& tagValue::name() const
 {
     return _name;
 }

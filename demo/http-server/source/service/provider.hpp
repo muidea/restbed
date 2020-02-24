@@ -32,7 +32,7 @@ class tagCallBacker
     : protected Observer
 {
 public:
-    tagCallBacker(set<string>& tags, string const& handler, CallBacker* callBakcer)
+    tagCallBacker(set<string> const& tags, string const& handler, CallBacker* callBakcer)
         : _tagSet(tags)
         , _handler(handler)
         , _callBakcer(callBakcer)

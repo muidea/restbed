@@ -15,7 +15,7 @@ public:
     tagValue(tagValue const& right);
     ~tagValue();
 
-    string const& name();
+    string const& name() const;
 
     void jsonVal(Json::Value& val);
     tagValue& operator=(tagValue const& right);
