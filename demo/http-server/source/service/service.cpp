@@ -36,7 +36,7 @@ int APIService::Start()
     auto queryHisDataResource = make_shared< Resource >( );
     queryHisDataResource->set_path( "/history/query" );
     auto queryHisDataFunc = bind(&APIService::queryHisData, this, placeholders::_1);
-    queryHisDataResource->set_method_handler( "GET", queryHisDataFunc );
+    queryHisDataResource->set_method_handler( "POST", queryHisDataFunc );
     _httpService.publish(queryHisDataResource);
 
     auto subscribeRealDataResource = make_shared< Resource >( );
@@ -121,6 +121,9 @@ void APIService::queryHisDataHandler(const shared_ptr< Session > session, Bytes 
     string reason = "";
 
     Json::Value jsonResult;
+    pageInfo page(1, 1, 50);
+
+    tagValuesMap values;
     do
     {
         if (!reader.parse(dataPtr, jsonParam)) {
@@ -135,15 +138,11 @@ void APIService::queryHisDataHandler(const shared_ptr< Session > session, Bytes 
             break;
         }
 
-        pageInfo page(1, 1, 50);
-
-        tagValuesMap values;
         _provider.queryValues(param.beginTime(), param.endTime(), param.valueCount(), values);
-
-        queryResult result(errorCode, reason, page, values);
-        result.jsonVal(jsonResult);
     } while (false);
 
+    queryResult result(errorCode, reason, page, values);
+    result.jsonVal(jsonResult);
     string resultContent  = jsonResult.toStyledString();
 
     stringstream stream;
