@@ -31,6 +31,22 @@ private:
 
 };
 
+
+class unknownResult 
+{
+public:
+    unknownResult();
+    unknownResult(unknownResult const& right);
+    ~unknownResult();
+
+    void jsonVal(Json::Value& val);
+    unknownResult& operator=(unknownResult const& right);
+
+protected:
+    int _errorCode;
+    string _reason;
+};
+
 class enumResult 
 {
 public:

@@ -56,6 +56,40 @@ pageInfo& pageInfo::operator=(pageInfo const& right)
     return *this;
 }
 
+unknownResult::unknownResult()
+    : _errorCode(-1)
+    , _reason("unknown error")
+{
+}
+
+unknownResult::unknownResult(unknownResult const& right)
+    : _errorCode(right._errorCode)
+    , _reason(right._reason)
+{
+}
+
+unknownResult::~unknownResult()
+{
+}
+
+void unknownResult::jsonVal(Json::Value& val)
+{
+    val["errorCode"] = this->_errorCode;
+    val["reason"] = this->_reason;
+}
+
+unknownResult& unknownResult::operator=(unknownResult const& right)
+{
+    if (this == &right) {
+        return *this;
+    }
+
+    this->_errorCode = right._errorCode;
+    this->_reason = right._reason;
+ 
+    return *this;
+}
+
 enumResult::enumResult(int errorCode, string const& reason, pageInfo const& pageInfo, tagInfoList const& tagInfos)
     : _errorCode(errorCode)
     , _reason(reason)

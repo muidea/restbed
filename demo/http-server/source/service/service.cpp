@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <memory>
+#include <exception>
 #include "service.hpp"
 #include "tag.hpp"
 #include "value.hpp"
@@ -104,8 +105,12 @@ void APIService::queryHisData(const shared_ptr<Session> session)
     getCurrentTimeStamp(currentTimeStamp);
     fprintf(stdout, "[%s] %s\n", currentTimeStamp.c_str(), "queryHisData");
 
-    auto handler = bind(&APIService::queryHisDataHandler, this, placeholders::_1, placeholders::_2);
-    session->fetch(content_length, handler);
+    try {
+        auto handler = bind(&APIService::queryHisDataHandler, this, placeholders::_1, placeholders::_2);
+        session->fetch(content_length, handler);
+    }catch(...) {
+        unknownErrorHandler(session);
+    }
 }
 
 void APIService::queryHisDataHandler(const shared_ptr<Session> session, Bytes const &payload)
@@ -160,8 +165,12 @@ void APIService::subscribeRealData(const shared_ptr<Session> session)
     getCurrentTimeStamp(currentTimeStamp);
     fprintf(stdout, "[%s] %s\n", currentTimeStamp.c_str(), "subscribeRealData");
 
-    auto handler = bind(&APIService::subscribeRealDataHandler, this, placeholders::_1, placeholders::_2);
-    session->fetch(content_length, handler);
+    try {
+        auto handler = bind(&APIService::subscribeRealDataHandler, this, placeholders::_1, placeholders::_2);
+        session->fetch(content_length, handler);
+    }catch(...){
+        unknownErrorHandler(session);
+    }
 }
 
 void APIService::subscribeRealDataHandler(const shared_ptr<Session> session, const Bytes &payload)
@@ -214,8 +223,12 @@ void APIService::unsubscribeRealData(const shared_ptr<Session> session)
     getCurrentTimeStamp(currentTimeStamp);
     fprintf(stdout, "[%s] %s\n", currentTimeStamp.c_str(), "unsubscribeRealData");
 
-    auto handler = bind(&APIService::unsubscribeRealDataHandler, this, placeholders::_1, placeholders::_2);
-    session->fetch(content_length, handler);
+    try {
+        auto handler = bind(&APIService::unsubscribeRealDataHandler, this, placeholders::_1, placeholders::_2);
+        session->fetch(content_length, handler);
+    }catch(...){
+        unknownErrorHandler(session);
+    }
 }
 
 void APIService::unsubscribeRealDataHandler(const shared_ptr<Session> session, const Bytes &payload)
@@ -321,4 +334,18 @@ void APIService::onHandle(string const &handler, tagValueList const &value)
 
         _provider.unsubscribe(handler);
     }
+}
+
+void APIService::unknownErrorHandler(const shared_ptr< Session > session)
+{
+    Json::Value jsonResult;
+    unknownResult result;
+    result.jsonVal(jsonResult);
+
+    string resultContent = jsonResult.toStyledString();
+    stringstream stream;
+    stream << resultContent.length();
+    string resultLen = stream.str();
+
+    session->close(OK, resultContent, {{"Content-Length", resultLen}, {"Connection", "close"}, {"Content-Type", "application/json;charset=UTF-8"}});
 }

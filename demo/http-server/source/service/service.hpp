@@ -36,6 +36,7 @@ protected:
 
     virtual void onHandle(string const& handler, tagValueList const& value);
 
+    void unknownErrorHandler(const shared_ptr< Session > session);
 private:
     Service _httpService;
 
