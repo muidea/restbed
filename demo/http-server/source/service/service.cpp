@@ -273,7 +273,6 @@ void APIService::unsubscribeRealDataHandler(const shared_ptr<Session> session, c
 void APIService::isHealth(const shared_ptr<Session> session)
 {
     const auto request = session->get_request();
-    size_t content_length = request->get_header("Content-Length", 0);
 
     string currentTimeStamp;
     getCurrentTimeStamp(currentTimeStamp);
