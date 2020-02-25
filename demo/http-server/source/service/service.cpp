@@ -283,9 +283,29 @@ void APIService::onHandle(string const &handler, tagValueList const &value)
     request->set_method("POST");
     request->set_body(resultContent);
 
+    bool isOK = false;
     auto response = Http::sync(request);
     if (response->get_status_code() == 200){
-        return;
+        isOK = true;
     }
 
+    int currentCount = 0;
+    {
+        jthread::JMutexAutoLock lock(_handlerMutex);
+        auto it = _handlerFailedCount.find(handler);
+        if (!isOK){
+            if(it == _handlerFailedCount.end()){
+                _handlerFailedCount[handler] = 1;
+                return;
+            }
+
+            currentCount = it->second++;
+        } else {
+            _handlerFailedCount.erase(it);
+        }
+    }
+
+    if (currentCount > 10){
+        _provider.unsubscribe(handler);
+    }
 }

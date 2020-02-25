@@ -1,11 +1,13 @@
 #ifndef __SERVICE_HPP_1656__
 #define __SERVICE_HPP_1656__
 
+#include <map>
 #include <memory>
 #include <cstdlib>
 #include <restbed>
 
 #include <json/json.h>
+#include <jthread/jmutexautolock.h>
 
 #include "provider.hpp"
 
@@ -38,6 +40,10 @@ private:
     Service _httpService;
 
     Provider _provider;
+    
+    map<string,int> _handlerFailedCount;
+    jthread::JMutex _handlerMutex;
+
 };
 
 #endif
