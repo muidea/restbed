@@ -74,7 +74,9 @@ void APIService::enumTags(const shared_ptr<Session> session)
     const auto request = session->get_request();
     size_t content_length = request->get_header("Content-Length", 0);
 
-    fprintf(stdout, "%s\n", "enumTags");
+    string currentTimeStamp;
+    getCurrentTimeStamp(currentTimeStamp);
+    fprintf(stdout, "[%s] %s\n", currentTimeStamp.c_str(), "enumTags");
 
     list<tagInfo> tags;
     _provider.queryTags(tags);
@@ -98,7 +100,9 @@ void APIService::queryHisData(const shared_ptr<Session> session)
     const auto request = session->get_request();
     size_t content_length = request->get_header("Content-Length", 0);
 
-    fprintf(stdout, "%s\n", "queryHisData");
+    string currentTimeStamp;
+    getCurrentTimeStamp(currentTimeStamp);
+    fprintf(stdout, "[%s] %s\n", currentTimeStamp.c_str(), "queryHisData");
 
     auto handler = bind(&APIService::queryHisDataHandler, this, placeholders::_1, placeholders::_2);
     session->fetch(content_length, handler);
@@ -152,7 +156,9 @@ void APIService::subscribeRealData(const shared_ptr<Session> session)
     const auto request = session->get_request();
     size_t content_length = request->get_header("Content-Length", 0);
 
-    fprintf(stdout, "%s\n", "subscribeRealData");
+    string currentTimeStamp;
+    getCurrentTimeStamp(currentTimeStamp);
+    fprintf(stdout, "[%s] %s\n", currentTimeStamp.c_str(), "subscribeRealData");
 
     auto handler = bind(&APIService::subscribeRealDataHandler, this, placeholders::_1, placeholders::_2);
     session->fetch(content_length, handler);
@@ -204,7 +210,9 @@ void APIService::unsubscribeRealData(const shared_ptr<Session> session)
     const auto request = session->get_request();
     size_t content_length = request->get_header("Content-Length", 0);
 
-    fprintf(stdout, "%s\n", "unsubscribeRealData");
+    string currentTimeStamp;
+    getCurrentTimeStamp(currentTimeStamp);
+    fprintf(stdout, "[%s] %s\n", currentTimeStamp.c_str(), "unsubscribeRealData");
 
     auto handler = bind(&APIService::unsubscribeRealDataHandler, this, placeholders::_1, placeholders::_2);
     session->fetch(content_length, handler);
@@ -254,7 +262,10 @@ void APIService::isHealth(const shared_ptr<Session> session)
     const auto request = session->get_request();
     size_t content_length = request->get_header("Content-Length", 0);
 
-    fprintf(stdout, "%s\n", "isHealth");
+    string currentTimeStamp;
+    getCurrentTimeStamp(currentTimeStamp);
+    fprintf(stdout, "[%s] %s\n", currentTimeStamp.c_str(), "isHealth");
+
     Json::Value jsonResult;
     healthResult result(0, "", 0);
     result.jsonVal(jsonResult);
@@ -269,8 +280,6 @@ void APIService::isHealth(const shared_ptr<Session> session)
 
 void APIService::onHandle(string const &handler, tagValueList const &value)
 {
-    fprintf(stdout, "onHandle:%s\n", handler.c_str());
-
     publishData publishData("", value);
     Json::Value jsonResult;
     publishData.jsonVal(jsonResult);
@@ -306,6 +315,10 @@ void APIService::onHandle(string const &handler, tagValueList const &value)
     }
 
     if (currentCount > 10){
+        string currentTimeStamp;
+        getCurrentTimeStamp(currentTimeStamp);
+        fprintf(stdout, "[%s] %s-%s\n", currentTimeStamp.c_str(), "unsubscribe unvisible handler", handler.c_str());
+
         _provider.unsubscribe(handler);
     }
 }

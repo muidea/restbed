@@ -9,6 +9,8 @@
 
 using namespace std;
 
+void getCurrentTimeStamp(string& curTimeStamp);
+
 class pageInfo 
 {
 public:

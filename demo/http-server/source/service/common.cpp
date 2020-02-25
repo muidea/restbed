@@ -1,5 +1,22 @@
 #include "common.hpp"
+#include <time.h>
+#include <sstream>
 
+// 2020年02月25日 
+void getCurrentTimeStamp(string& curTimeStamp)
+{
+    const time_t t = time(NULL);
+    struct tm* current_time = localtime(&t);
+    stringstream ss;
+    ss << current_time->tm_year + 1900 << "-"
+     << current_time->tm_mon + 1 << "-"
+     << current_time->tm_mday << " "
+     << current_time->tm_hour << ":"
+     << current_time->tm_min << ":"
+     << current_time->tm_sec;
+
+     curTimeStamp = ss.str();
+}
 
 pageInfo::pageInfo(int totalPage, int currentPage, int pageSize)
     : _totalPage(totalPage)
