@@ -271,18 +271,21 @@ void APIService::onHandle(string const &handler, tagValueList const &value)
 {
     fprintf(stdout, "onHandle:%s\n", handler.c_str());
 
-    string messsgae_body = "{\"hello\":\"yao\"}";
+    publishData publishData("", value);
+    Json::Value jsonResult;
+    publishData.jsonVal(jsonResult);
+    const string& resultContent = jsonResult.toStyledString();
+
     auto request = make_shared<Request>(Uri(handler));
+    request->set_header( "Host", request->get_host());
     request->add_header("Content-Type", "application/json");
-    request->add_header("Content-Length", to_string(messsgae_body.length()));
+    request->add_header("Content-Length", to_string(resultContent.length()));
     request->set_method("POST");
-    request->set_body(messsgae_body);
+    request->set_body(resultContent);
+
     auto response = Http::sync(request);
+    if (response->get_status_code() == 200){
+        return;
+    }
 
-    fprintf(stdout, "Http::sync, statusCode:%d, message:%s\n", response->get_status_code(), response->get_status_message());
-
-    auto length = response->get_header("Content-Length", 0);
-    Http::fetch(length, response);
-    string response_body((char *)response->get_body().data());
-    cout << "response：" << response_body << endl;
 }
