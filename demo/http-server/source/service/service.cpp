@@ -4,7 +4,6 @@
 #include <sstream>
 #include <iostream>
 #include <stdlib.h>
-#include <unistd.h>
 #include "service.hpp"
 #include "tag.hpp"
 #include "value.hpp"
@@ -24,8 +23,6 @@ APIService::~APIService()
 
 int APIService::Start()
 {
-    _runningFlag = true;
-
     auto enumTagsResource = make_shared< Resource >( );
     enumTagsResource->set_path( "/tags/enum" );
     auto enumTagsFunc = bind(&APIService::enumTags, this, placeholders::_1);
@@ -57,20 +54,15 @@ int APIService::Start()
     isHealthResource->set_method_handler( "GET", isHealthFunc );
     _httpService.publish(isHealthResource);
 
-    _provider.start();
-
-    return JThread::Start();
+    return _provider.start();
 }
 
 void APIService::Stop()
 {
-    _runningFlag = false;
 
     _provider.stop();
 
     _httpService.stop();
-
-    JThread::Kill();
 }
 
 void APIService::Run()
@@ -263,14 +255,7 @@ void APIService::isHealth( const shared_ptr< Session > session )
     session->close( OK, resultContent, { { "Content-Length", resultLen }, { "Connection", "close" }, { "Content-Type", "application/json;charset=UTF-8" } } );
 }
 
-void* APIService::Thread()
+void APIService::onHandle(string const& handler, tagValueList const& value)
 {
-    JThread::ThreadStarted();
-    
-    while (_runningFlag)
-    {
-        sleep(1);
-
-        fprintf( stdout, "%s\n", "APIService::Thread" );
-    }
+    fprintf( stdout, "onHandle:%s\n", "handler" );
 }

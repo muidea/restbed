@@ -5,11 +5,13 @@
 #include <set>
 #include <map>
 #include <memory>
+#include <jthread/jthread.h>
 #include <jthread/jmutex.h>
 #include "tag.hpp"
 #include "value.hpp"
 
 using namespace std;
+using namespace jthread;
 
 class CallBacker
 {
@@ -77,10 +79,13 @@ private:
     CallBacker* _callBakcer;
 };
 
+typedef shared_ptr<tagCallBacker> tagCallBackerPtr;
+
 // tag name -> tagCallBacker
-typedef multimap< string, shared_ptr<tagCallBacker> > tagCallBackerMap;
+typedef multimap< string, tagCallBackerPtr > tagCallBackerMap;
 
 class Provider
+    : protected JThread
 {
 public:
     Provider();
@@ -95,6 +100,11 @@ public:
     void unsubscribe( set<string> const& tags, string const& handler );
 
 protected:
+    virtual void *Thread();
+
+protected:
+    bool _runningFlag;
+
     tagCallBackerMap _tagCallBackerMap;
     jthread::JMutex _tagCallBackerMutex;
 

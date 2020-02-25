@@ -6,16 +6,14 @@
 #include <restbed>
 
 #include <json/json.h>
-#include <jthread/jthread.h>
 
 #include "provider.hpp"
 
 using namespace std;
 using namespace restbed;
-using namespace jthread;
 
-class APIService
-    : protected JThread {
+class APIService 
+    : protected CallBacker {
 public:
     APIService();
     virtual ~APIService();
@@ -34,10 +32,9 @@ protected:
     void subscribeRealDataHandler(const shared_ptr< Session > session, Bytes const& payload);
     void unsubscribeRealDataHandler(const shared_ptr< Session > session, Bytes const& payload);
 
-    virtual void *Thread();
+    virtual void onHandle(string const& handler, tagValueList const& value);
 
 private:
-    bool _runningFlag;
     Service _httpService;
 
     Provider _provider;
