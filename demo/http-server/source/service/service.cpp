@@ -99,6 +99,8 @@ void APIService::queryHisData( const shared_ptr< Session > session )
     const auto request = session->get_request( );
     size_t content_length = request->get_header( "Content-Length", 0 );
 
+    fprintf( stdout, "%s\n", "queryHisData" );
+
     auto handler = bind(&APIService::queryHisDataHandler, this, placeholders::_1, placeholders::_2);
     session->fetch( content_length, handler);
 }
@@ -149,6 +151,8 @@ void APIService::subscribeRealData( const shared_ptr< Session > session )
     const auto request = session->get_request( );
     size_t content_length = request->get_header( "Content-Length", 0 );
 
+    fprintf( stdout, "%s\n", "subscribeRealData" );
+
     auto handler = bind(&APIService::subscribeRealDataHandler, this, placeholders::_1, placeholders::_2);
     session->fetch( content_length, handler);
 }
@@ -175,6 +179,7 @@ void APIService::subscribeRealDataHandler(const shared_ptr< Session > session, c
             reason = "invalid jsonParam";
             break;
         }
+        _provider.subscribe(param.callBack(), param.tags(), this);
 
     } while (false);
         
@@ -196,6 +201,8 @@ void APIService::unsubscribeRealData( const shared_ptr< Session > session )
 {
     const auto request = session->get_request( );
     size_t content_length = request->get_header( "Content-Length", 0 );
+
+    fprintf( stdout, "%s\n", "unsubscribeRealData" );
 
     auto handler = bind(&APIService::unsubscribeRealDataHandler, this, placeholders::_1, placeholders::_2);
     session->fetch( content_length, handler);
@@ -223,6 +230,7 @@ void APIService::unsubscribeRealDataHandler(const shared_ptr< Session > session,
             break;
         }
 
+        _provider.unsubscribe(param.callBack());
     } while (false);
 
     Json::Value jsonResult;
@@ -257,5 +265,5 @@ void APIService::isHealth( const shared_ptr< Session > session )
 
 void APIService::onHandle(string const& handler, tagValueList const& value)
 {
-    fprintf( stdout, "onHandle:%s\n", "handler" );
+    fprintf( stdout, "onHandle:%s\n", handler.c_str() );
 }

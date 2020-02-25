@@ -42,52 +42,18 @@ void Provider::queryValues(string const& beginTime, string const& endTime, int v
     mockTagsValues(values);
 }
 
-void Provider::subscribe(set<string> const& tags, string const& handler, CallBacker* callBacker)
+void Provider::subscribe(string const& handler, set<string> const& tags, CallBacker* callBacker)
 {
-    jthread::JMutexAutoLock lock(_tagCallBackerMutex);
-    auto iter = tags.begin();
-    for (; iter != tags.end(); ++iter) {
-        auto range = _tagCallBackerMap.equal_range(*iter);
-        if (range.first == end(_tagCallBackerMap)) {
-            tagCallBackerPtr ptr(new tagCallBacker(tags, handler, callBacker));
-            _tagCallBackerMap.insert(make_pair(*iter, ptr));
-
-            continue;
-        }
-
-        bool find = false;
-        for (auto it = range.first; it != range.second; ++it) {
-            if( it->second->handler() == handler) {
-                find = true;
-                break;
-            }
-        }
-
-        if(!find){
-            tagCallBackerPtr ptr(new tagCallBacker(tags, handler, callBacker));
-            _tagCallBackerMap.insert(make_pair(*iter, ptr));
-        }
-    }
+    jthread::JMutexAutoLock lock(_handlerCallBackerMutex);
+    
+    tagCallBackerPtr curCallBacker(new tagCallBacker(tags, handler, callBacker));
+    _handlerCallBackerMap[handler] = curCallBacker;
 }
 
-void Provider::unsubscribe(set<string> const& tags, string const& handler)
+void Provider::unsubscribe(string const& handler)
 {
-    jthread::JMutexAutoLock lock(_tagCallBackerMutex);
-    auto iter = tags.begin();
-    for (; iter != tags.end(); ++iter){
-        auto range = _tagCallBackerMap.equal_range(*iter);
-        if (range.first == end(_tagCallBackerMap)) {
-            continue;
-        }
-
-        for (auto it = range.first; it != range.second; ++it)
-        {
-            if( it->second->handler() == handler) {
-                _tagCallBackerMap.erase(it);
-                break;
-            }
-        }
-    }
+    jthread::JMutexAutoLock lock(_handlerCallBackerMutex);
+    _handlerCallBackerMap.erase(handler);
 }
 
 void* Provider::Thread()
@@ -100,24 +66,24 @@ void* Provider::Thread()
         tagValueList values;
         mockValues(values);
 
-/*
-        jthread::JMutexAutoLock lock(_tagCallBackerMutex);
-        auto iter = values.begin();
-        for (; iter != values.end(); ++iter){
-            auto range = _tagCallBackerMap.equal_range(iter->name());
-            if (range.first == end(_tagCallBackerMap)) {
-                continue;
-            }
-
-            for (auto it = range.first; it != range.second; ++it)
-            {
-                if( it->second->handler() == handler) {
-                    _tagCallBackerMap.erase(it);
-                    break;
+        handlerCallBackerMap handlerCallBackerMap;
+        {
+            jthread::JMutexAutoLock lock(_handlerCallBackerMutex);
+            auto iter = values.begin();
+            for (; iter != values.end(); ++iter) {
+                for (auto it = _handlerCallBackerMap.begin(); it != _handlerCallBackerMap.end(); ++it) {
+                    if (it->second->onNotify(*iter)){
+                        handlerCallBackerMap[it->first] = it->second;
+                    }
                 }
             }
         }
-*/
+
+        auto it = handlerCallBackerMap.begin();
+        for (; it != handlerCallBackerMap.end(); ++it ) {
+            it->second->dispatch();
+        }
     }
+
 }
 

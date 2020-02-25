@@ -20,18 +20,9 @@ public:
     virtual void onHandle(string const& handler, tagValueList const& value) = 0;
 };
 
-class Observer
-{
-public:
-    virtual ~Observer(){};
-    virtual void onNotify(tagValue const& val) = 0;
-};
-
 typedef list<CallBacker> CallBackerList;
-typedef list<Observer> ObserverList;
 
 class tagCallBacker
-    : protected Observer
 {
 public:
     tagCallBacker(set<string> const& tags, string const& handler, CallBacker* callBakcer)
@@ -47,11 +38,6 @@ public:
 
     }
 
-    string const& handler()
-    {
-        return _handler;
-    }
-
     void dispatch()
     {
         tagValueList temp;
@@ -60,15 +46,15 @@ public:
         _tagValueList.swap(temp);
     }
 
-protected:
-    virtual void onNotify(tagValue const& val)
+    bool onNotify(tagValue const& val)
     {
         auto iter = _tagSet.find(val.name());
         if(iter == _tagSet.end()) {
-            return;
+            return false;
         }
 
         _tagValueList.push_back(val);
+        return true;
     }
 
 private:
@@ -81,8 +67,8 @@ private:
 
 typedef shared_ptr<tagCallBacker> tagCallBackerPtr;
 
-// tag name -> tagCallBacker
-typedef multimap< string, tagCallBackerPtr > tagCallBackerMap;
+// handler -> tagCallBacker
+typedef map< string, tagCallBackerPtr > handlerCallBackerMap;
 
 class Provider
     : protected JThread
@@ -96,8 +82,8 @@ public:
 
     void queryTags(tagInfoList& tags);
     void queryValues(string const& beginTime, string const& endTime, int valueCount, tagValuesMap& values);
-    void subscribe( set<string> const& tags, string const& handler, CallBacker* callBacker );
-    void unsubscribe( set<string> const& tags, string const& handler );
+    void subscribe( string const& handler, set<string> const& tags, CallBacker* callBacker );
+    void unsubscribe( string const& handler );
 
 protected:
     virtual void *Thread();
@@ -105,8 +91,9 @@ protected:
 protected:
     bool _runningFlag;
 
-    tagCallBackerMap _tagCallBackerMap;
-    jthread::JMutex _tagCallBackerMutex;
+    handlerCallBackerMap _handlerCallBackerMap;
+
+    jthread::JMutex _handlerCallBackerMutex;
 
 };
 
