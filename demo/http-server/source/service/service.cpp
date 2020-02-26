@@ -89,11 +89,8 @@ void APIService::enumTags(const shared_ptr<Session> session)
     result.jsonVal(jsonResult);
 
     string resultContent = jsonResult.toStyledString();
-    stringstream stream;
-    stream << resultContent.length();
-    string resultLen = stream.str();
 
-    session->close(OK, resultContent, {{"Content-Length", resultLen}, {"Connection", "close"}, {"Content-Type", "application/json;charset=UTF-8"}});
+    session->close(OK, resultContent, {{"Content-Length", to_string(resultContent.length())}, {"Connection", "close"}, {"Content-Type", "application/json;charset=UTF-8"}});
 }
 
 void APIService::queryHisData(const shared_ptr<Session> session)
@@ -149,11 +146,7 @@ void APIService::queryHisDataHandler(const shared_ptr<Session> session, Bytes co
     result.jsonVal(jsonResult);
     string resultContent = jsonResult.toStyledString();
 
-    stringstream stream;
-    stream << resultContent.length();
-    string resultLen = stream.str();
-
-    session->close(OK, resultContent, {{"Content-Length", resultLen}, {"Connection", "close"}, {"Content-Type", "application/json;charset=UTF-8"}});
+    session->close(OK, resultContent, {{"Content-Length", to_string(resultContent.length())}, {"Connection", "close"}, {"Content-Type", "application/json;charset=UTF-8"}});
 }
 
 void APIService::subscribeRealData(const shared_ptr<Session> session)
@@ -207,11 +200,7 @@ void APIService::subscribeRealDataHandler(const shared_ptr<Session> session, con
 
     string resultContent = jsonResult.toStyledString();
 
-    stringstream stream;
-    stream << resultContent.length();
-    string resultLen = stream.str();
-
-    session->close(OK, resultContent, {{"Content-Length", resultLen}, {"Connection", "close"}, {"Content-Type", "application/json;charset=UTF-8"}});
+    session->close(OK, resultContent, {{"Content-Length", to_string(resultContent.length())}, {"Connection", "close"}, {"Content-Type", "application/json;charset=UTF-8"}});
 }
 
 void APIService::unsubscribeRealData(const shared_ptr<Session> session)
@@ -263,11 +252,8 @@ void APIService::unsubscribeRealDataHandler(const shared_ptr<Session> session, c
     result.jsonVal(jsonResult);
 
     string resultContent = jsonResult.toStyledString();
-    stringstream stream;
-    stream << resultContent.length();
-    string resultLen = stream.str();
 
-    session->close(OK, resultContent, {{"Content-Length", resultLen}, {"Connection", "close"}, {"Content-Type", "application/json;charset=UTF-8"}});
+    session->close(OK, resultContent, {{"Content-Length", to_string(resultContent.length())}, {"Connection", "close"}, {"Content-Type", "application/json;charset=UTF-8"}});
 }
 
 void APIService::isHealth(const shared_ptr<Session> session)
@@ -283,11 +269,7 @@ void APIService::isHealth(const shared_ptr<Session> session)
     result.jsonVal(jsonResult);
 
     string resultContent = jsonResult.toStyledString();
-    stringstream stream;
-    stream << resultContent.length();
-    string resultLen = stream.str();
-
-    session->close(OK, resultContent, {{"Content-Length", resultLen}, {"Connection", "close"}, {"Content-Type", "application/json;charset=UTF-8"}});
+    session->close(OK, resultContent, {{"Content-Length", to_string(resultContent.length())}, {"Connection", "close"}, {"Content-Type", "application/json;charset=UTF-8"}});
 }
 
 void APIService::onHandle(string const &handler, tagValueList const &value)
@@ -298,7 +280,7 @@ void APIService::onHandle(string const &handler, tagValueList const &value)
     const string& resultContent = jsonResult.toStyledString();
 
     auto request = make_shared<Request>(Uri(handler));
-    request->set_header( "Host", request->get_host());
+    request->set_header("Host", request->get_host());
     request->add_header("Content-Type", "application/json");
     request->add_header("Content-Length", to_string(resultContent.length()));
     request->set_method("POST");
@@ -342,9 +324,6 @@ void APIService::unknownErrorHandler(const shared_ptr< Session > session)
     result.jsonVal(jsonResult);
 
     string resultContent = jsonResult.toStyledString();
-    stringstream stream;
-    stream << resultContent.length();
-    string resultLen = stream.str();
 
-    session->close(OK, resultContent, {{"Content-Length", resultLen}, {"Connection", "close"}, {"Content-Type", "application/json;charset=UTF-8"}});
+    session->close(OK, resultContent, {{"Content-Length", to_string(resultContent.length())}, {"Connection", "close"}, {"Content-Type", "application/json;charset=UTF-8"}});
 }
