@@ -56,6 +56,40 @@ pageInfo& pageInfo::operator=(pageInfo const& right)
     return *this;
 }
 
+commonResult::commonResult(int errorCode, string const& reason)
+    : _errorCode(errorCode)
+    , _reason(reason)
+{
+}
+
+commonResult::commonResult(commonResult const& right)
+    : _errorCode(right._errorCode)
+    , _reason(right._reason)
+{
+}
+
+commonResult::~commonResult()
+{
+}
+
+void commonResult::jsonVal(Json::Value& val)
+{
+    val["errorCode"] = this->_errorCode;
+    val["reason"] = this->_reason;
+}
+
+commonResult& commonResult::operator=(commonResult const& right)
+{
+    if (this == &right){
+        return *this;
+    }
+
+    this->_errorCode = right._errorCode;
+    this->_reason = right._reason;
+
+    return *this;
+}
+
 unknownResult::unknownResult()
     : _errorCode(-1)
     , _reason("unknown error")

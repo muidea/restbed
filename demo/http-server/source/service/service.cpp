@@ -103,8 +103,12 @@ void APIService::queryHisData(const shared_ptr<Session> session)
     fprintf(stdout, "[%s] %s\n", currentTimeStamp.c_str(), "queryHisData");
 
     try {
-        auto handler = bind(&APIService::queryHisDataHandler, this, placeholders::_1, placeholders::_2);
-        session->fetch(content_length, handler);
+        if (content_length > 0) {
+            auto handler = bind(&APIService::queryHisDataHandler, this, placeholders::_1, placeholders::_2);
+            session->fetch(content_length, handler);
+        } else {
+            commonErrorHandler(session, 1, "invalid post param");
+        }
     }catch(...) {
         unknownErrorHandler(session);
     }
@@ -159,8 +163,12 @@ void APIService::subscribeRealData(const shared_ptr<Session> session)
     fprintf(stdout, "[%s] %s\n", currentTimeStamp.c_str(), "subscribeRealData");
 
     try {
-        auto handler = bind(&APIService::subscribeRealDataHandler, this, placeholders::_1, placeholders::_2);
-        session->fetch(content_length, handler);
+        if (content_length >0){
+            auto handler = bind(&APIService::subscribeRealDataHandler, this, placeholders::_1, placeholders::_2);
+            session->fetch(content_length, handler);
+        } else {
+            commonErrorHandler(session, 1, "invalid post param");
+        }
     }catch(...){
         unknownErrorHandler(session);
     }
@@ -213,8 +221,12 @@ void APIService::unsubscribeRealData(const shared_ptr<Session> session)
     fprintf(stdout, "[%s] %s\n", currentTimeStamp.c_str(), "unsubscribeRealData");
 
     try {
-        auto handler = bind(&APIService::unsubscribeRealDataHandler, this, placeholders::_1, placeholders::_2);
-        session->fetch(content_length, handler);
+        if (content_length>0) {
+            auto handler = bind(&APIService::unsubscribeRealDataHandler, this, placeholders::_1, placeholders::_2);
+            session->fetch(content_length, handler);
+        } else {
+            commonErrorHandler(session, 1, "invalid post param");
+        }
     }catch(...){
         unknownErrorHandler(session);
     }
@@ -316,6 +328,19 @@ void APIService::onHandle(string const &handler, tagValueList const &value)
         _provider.unsubscribe(handler);
     }
 }
+
+
+void APIService::commonErrorHandler(const shared_ptr< Session > session, int errorCode, string const& reason)
+{
+    Json::Value jsonResult;
+    commonResult result(errorCode, reason);
+    result.jsonVal(jsonResult);
+
+    string resultContent = jsonResult.toStyledString();
+
+    session->close(OK, resultContent, {{"Content-Length", to_string(resultContent.length())}, {"Connection", "close"}, {"Content-Type", "application/json;charset=UTF-8"}});
+}
+
 
 void APIService::unknownErrorHandler(const shared_ptr< Session > session)
 {

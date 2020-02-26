@@ -31,6 +31,20 @@ private:
 
 };
 
+class commonResult 
+{
+public:
+    commonResult(int errorCode, string const& reason);
+    commonResult(commonResult const& right);
+    ~commonResult();
+
+    void jsonVal(Json::Value& val);
+    commonResult& operator=(commonResult const& right);
+
+protected:
+    int _errorCode;
+    string _reason;
+};
 
 class unknownResult 
 {
