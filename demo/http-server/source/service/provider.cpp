@@ -1,5 +1,8 @@
 #include "provider.hpp"
+#ifndef _WIN32
 #include <unistd.h>
+#endif
+
 #include <jthread/jmutexautolock.h>
 #include <algorithm>
 
@@ -62,7 +65,12 @@ void* Provider::Thread()
     
     while (_runningFlag)
     {
+        #ifndef _WIN32
         sleep(1);
+        #else
+        Sleep(1000);
+        #endif
+
         tagValueList values;
         mockValues(values);
 
@@ -85,5 +93,6 @@ void* Provider::Thread()
         }
     }
 
+    return NULL;
 }
 

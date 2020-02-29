@@ -145,13 +145,13 @@ public:
 
     string const& beginTime();
     string const& endTime();
-    uint valueCount();
+    unsigned int valueCount();
     set<string> const& tags();
 
 protected:
     string _beginTime;
     string _endTime;
-    uint _count;
+    unsigned int _count;
     set<string> _tags;
 };
 

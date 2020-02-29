@@ -325,7 +325,7 @@ int queryParam::parse(Json::Value& val)
 {
     string beginTime;
     string endTime;
-    uint valueCount;
+    unsigned int valueCount;
     if(val["beginTime"].isNull()){
         return -1;
     }
@@ -384,7 +384,7 @@ string const& queryParam::endTime()
     return this->_endTime;
 }
 
-uint queryParam::valueCount()
+unsigned int queryParam::valueCount()
 {
     return this->_count;
 }
