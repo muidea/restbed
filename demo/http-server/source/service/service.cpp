@@ -73,8 +73,7 @@ void APIService::Run()
 void APIService::enumTags(const shared_ptr<Session> session)
 {
     const auto request = session->get_request();
-    size_t content_length = request->get_header("Content-Length", 0);
-
+    
     string currentTimeStamp;
     getCurrentTimeStamp(currentTimeStamp);
     fprintf(stdout, "[%s] %s\n", currentTimeStamp.c_str(), "enumTags");
@@ -117,7 +116,7 @@ void APIService::queryHisData(const shared_ptr<Session> session)
 void APIService::queryHisDataHandler(const shared_ptr<Session> session, Bytes const &payload)
 {
     char *dataPtr = (char *)payload.data();
-    Json::Reader reader;
+
     Json::Value jsonParam;
 
     int errorCode = 0;
@@ -129,10 +128,15 @@ void APIService::queryHisDataHandler(const shared_ptr<Session> session, Bytes co
     tagValuesMap values;
     do
     {
-        if (!reader.parse(dataPtr, jsonParam))
-        {
+        bool res;
+        string errs;
+        Json::CharReaderBuilder readerBuilder;
+        std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
+        res = jsonReader->parse(dataPtr, dataPtr + payload.size(), &jsonParam, &errs);
+        if (!res || !errs.empty()) {
             errorCode = 1;
             reason = "invalid jsonParam";
+            break;
         }
 
         queryParam param;
@@ -177,7 +181,6 @@ void APIService::subscribeRealData(const shared_ptr<Session> session)
 void APIService::subscribeRealDataHandler(const shared_ptr<Session> session, const Bytes &payload)
 {
     char *dataPtr = (char *)payload.data();
-    Json::Reader reader;
     Json::Value jsonParam;
 
     int errorCode = 0;
@@ -185,10 +188,15 @@ void APIService::subscribeRealDataHandler(const shared_ptr<Session> session, con
 
     do
     {
-        if (!reader.parse(dataPtr, jsonParam))
-        {
+        bool res;
+        string errs;
+        Json::CharReaderBuilder readerBuilder;
+        std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
+        res = jsonReader->parse(dataPtr, dataPtr + payload.size(), &jsonParam, &errs);
+        if (!res || !errs.empty()) {
             errorCode = 1;
             reason = "invalid jsonParam";
+            break;
         }
 
         subscribeParam param;
@@ -235,17 +243,21 @@ void APIService::unsubscribeRealData(const shared_ptr<Session> session)
 void APIService::unsubscribeRealDataHandler(const shared_ptr<Session> session, const Bytes &payload)
 {
     char *dataPtr = (char *)payload.data();
-    Json::Reader reader;
     Json::Value jsonParam;
 
     int errorCode = 0;
     string reason = "";
     do
     {
-        if (!reader.parse(dataPtr, jsonParam))
-        {
+        bool res;
+        string errs;
+        Json::CharReaderBuilder readerBuilder;
+        std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
+        res = jsonReader->parse(dataPtr, dataPtr + payload.size(), &jsonParam, &errs);
+        if (!res || !errs.empty()) {
             errorCode = 1;
             reason = "invalid jsonParam";
+            break;
         }
 
         unsubscribeParam param;
