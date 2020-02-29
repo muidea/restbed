@@ -67,7 +67,10 @@ void APIService::Stop()
 
 void APIService::Run()
 {
-    _httpService.start();
+    auto settings = make_shared<Settings>();
+    settings->set_port(8020);
+
+    _httpService.start(settings);
 }
 
 void APIService::enumTags(const shared_ptr<Session> session)
