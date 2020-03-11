@@ -143,14 +143,14 @@ public:
 
     int parse(Json::Value& val);
 
-    string const& beginTime();
-    string const& endTime();
+    int beginTime();
+    int endTime();
     unsigned int valueCount();
     set<string> const& tags();
 
 protected:
-    string _beginTime;
-    string _endTime;
+    int _beginTime;
+    int _endTime;
     unsigned int _count;
     set<string> _tags;
 };

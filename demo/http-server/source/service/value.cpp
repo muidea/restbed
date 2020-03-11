@@ -1,6 +1,6 @@
 #include "value.hpp"
 
-tagValue::tagValue(string const &name, Json::Value const& val, int quality, string timeStamp)
+tagValue::tagValue(string const &name, Json::Value const& val, int quality, int timeStamp)
     : _name(name)
     , _value(val)
     , _quality(quality)

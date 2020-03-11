@@ -323,8 +323,8 @@ queryParam::~queryParam()
 
 int queryParam::parse(Json::Value& val)
 {
-    string beginTime;
-    string endTime;
+    int beginTime;
+    int endTime;
     unsigned int valueCount;
     if(val["beginTime"].isNull()){
         return -1;
@@ -339,16 +339,8 @@ int queryParam::parse(Json::Value& val)
         return -1;
     }
 
-    beginTime = val["beginTime"].asString();
-    if (beginTime.length() == 0){
-        return -1;
-    }
-
-    endTime = val["endTime"].asString();
-    if (endTime.length() == 0){
-        return -1;
-    }
-
+    beginTime = val["beginTime"].asInt();
+    endTime = val["endTime"].asInt();
     valueCount = val["count"].asUInt();
 
     Json::Value tagsVal = val["tags"];
@@ -374,12 +366,12 @@ int queryParam::parse(Json::Value& val)
     return  0;
 }
 
-string const& queryParam::beginTime()
+int queryParam::beginTime()
 {
     return this->_beginTime;
 }
 
-string const& queryParam::endTime()
+int queryParam::endTime()
 {
     return this->_endTime;
 }

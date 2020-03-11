@@ -11,7 +11,7 @@ using namespace std;
 class tagValue 
 {
 public:
-    tagValue(string const &name, Json::Value const& val, int quality, string timeStamp);
+    tagValue(string const &name, Json::Value const& val, int quality, int timeStamp);
     tagValue(tagValue const& right);
     ~tagValue();
 
@@ -24,7 +24,7 @@ protected:
     string _name;
     Json::Value _value;
     int _quality;
-    string _timeStamp;
+    int _timeStamp;
 
 private:
     tagValue();

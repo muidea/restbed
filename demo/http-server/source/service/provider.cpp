@@ -6,6 +6,7 @@
 #include <jthread/jmutexautolock.h>
 #include <algorithm>
 
+void getCurrentTimeStamp(string& curTimeStamp);
 
 void mockTags( list< tagInfo >& tags );
 void mockValues(list<tagValue>& values);
@@ -40,7 +41,7 @@ void Provider::queryTags(tagInfoList& tags)
     mockTags(tags);
 }
 
-void Provider::queryValues(string const& beginTime, string const& endTime, int valueCount, tagValuesMap& values)
+void Provider::queryValues(int beginTime, int endTime, int valueCount, tagValuesMap& values)
 {
     mockTagsValues(values);
 }

@@ -331,15 +331,13 @@ void APIService::onHandle(string const &handler, tagValueList const &value)
 
             currentCount = it->second++;
         } else {
-            _handlerFailedCount.erase(it);
+            if (it!=_handlerFailedCount.end()) {
+                _handlerFailedCount.erase(it);
+            }
         }
     }
 
     if (currentCount > 10){
-        string currentTimeStamp;
-        getCurrentTimeStamp(currentTimeStamp);
-        fprintf(stdout, "[%s] %s-%s\n", currentTimeStamp.c_str(), "unsubscribe unvisible handler", handler.c_str());
-
         _provider.unsubscribe(handler);
     }
 }

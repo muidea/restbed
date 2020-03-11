@@ -81,7 +81,7 @@ public:
     void stop();
 
     void queryTags(tagInfoList& tags);
-    void queryValues(string const& beginTime, string const& endTime, int valueCount, tagValuesMap& values);
+    void queryValues(int beginTime, int endTime, int valueCount, tagValuesMap& values);
     void subscribe( string const& handler, set<string> const& tags, CallBacker* callBacker );
     void unsubscribe( string const& handler );
 
